@@ -27,7 +27,9 @@ final class PainelExtratoRequest extends FormRequest
             'tipos.*'   => ['string', Rule::in(FiltrosExtrato::TIPOS_VALIDOS)],
             'busca'     => ['nullable', 'string', 'max:120'],
             'page'      => ['nullable', 'integer', 'min:1'],
-            'per_page'  => ['nullable', 'integer', 'between:1,200'],
+            // Limite alto pra suportar pré-carregamento do extrato inteiro do
+            // ano no SPA (drill tooltip dos charts da Home consome tudo de uma vez).
+            'per_page'  => ['nullable', 'integer', 'between:1,5000'],
         ];
     }
 

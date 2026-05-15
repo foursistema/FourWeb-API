@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Dashboard\ReceitasController;
 use App\Http\Controllers\Api\EscolaController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/escola/lookup', [EscolaController::class, 'lookup'])->name('escola.lookup');
 Route::get('/escola/{id}', [EscolaController::class, 'show'])
     ->whereNumber('id')
     ->name('escola.show');

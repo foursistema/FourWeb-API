@@ -22,10 +22,31 @@ final class EscolaRepository implements EscolaRepositoryInterface
             LIMIT 1
         SQL, [$id]);
 
-        if ($row === null) {
+        return $row === null ? null : $this->hydrate($row);
+    }
+
+    public function buscarPorCnpj(string $cnpj): ?Escola
+    {
+        $normalizado = preg_replace('/\D+/', '', $cnpj) ?? '';
+        if ($normalizado === '') {
             return null;
         }
 
+        // CNPJ pode vir formatado (XX.XXX.XXX/XXXX-XX) ou só dígitos. Comparo
+        // ambos lados sem máscara pra cobrir todos os formatos cadastrados.
+        $row = $this->db->selectOne(<<<'SQL'
+            SELECT id, razao_social, nome_escola, cnpj, diretor, municipio,
+                   codigo_inep, telefone, email
+            FROM escolas_favoritas
+            WHERE regexp_replace(cnpj, '\D', '', 'g') = ?
+            LIMIT 1
+        SQL, [$normalizado]);
+
+        return $row === null ? null : $this->hydrate($row);
+    }
+
+    private function hydrate(object $row): Escola
+    {
         return new Escola(
             id: (int) $row->id,
             razaoSocial: (string) ($row->razao_social ?? ''),
