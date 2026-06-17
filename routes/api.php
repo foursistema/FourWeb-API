@@ -23,5 +23,18 @@ Route::prefix('dashboard')->group(function (): void {
     Route::get('/consulta', ConsultaController::class)->name('dashboard.consulta');
     Route::get('/extrato', ExtratoController::class)->name('dashboard.extrato');
 });
-
+// PROXY DE LOGO PARA EXTRAÇÃO DE COR (CORS BYPASS)
+Route::get('/proxy-logo', function (Illuminate\Http\Request $request) {
+    $url = $request->query('url');
+    if (!$url) return response()->json(['error' => 'No URL'], 400);
+    try {
+        $client = new \GuzzleHttp\Client();
+        $res = $client->get($url);
+        return response($res->getBody(), 200)
+            ->header('Content-Type', $res->getHeaderLine('Content-Type'))
+            ->header('Access-Control-Allow-Origin', '*');
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed'], 500);
+    }
+});
 Route::get('/filtros', FiltrosController::class)->name('filtros');
